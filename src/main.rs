@@ -24,6 +24,9 @@ fn main() {
     let mut map_idx: usize = 0;
     let alphabet_char_index: HashMap<char, usize> = ALPHABET_CHAR.iter().map(|&data| {map_idx += 1; (data, map_idx) }).collect();
 
+    map_idx = 0;
+    let scp_char_index: HashMap<char, usize> = SCP_CHAR.iter().map(|&data| {map_idx += 1; (data, map_idx) }).collect();
+
     let words_file: EmbeddedFile = Asset::get("words.txt").unwrap();
     let english_words = str::from_utf8(words_file.data.as_ref()).expect("An error occurred while reading the words list").split("\n").collect::<Vec<&str>>();
 
@@ -35,7 +38,10 @@ fn main() {
         let encoded1 = parts.next().expect("Received an invalidly formatted input");
         let info1 = parts.next().expect("Received an invalidly formatted input");
 
+        let encoded = map_encoded(encoded1, &scp_char_index);
         let info = decode_info(info1);
+
+        let min_second_value = get_min_second_value(encoded, info.first_value);
 
         //Slice the alphabet to only the ones that matter.
         let used_chars = ALPHABET_CHAR.iter().skip(info.lowest_value - 1).collect::<Vec<&char>>();
@@ -50,8 +56,10 @@ fn main() {
         for english_word in english_words.iter() {
             //Sure, this could be shortened, but it would be a massive if statement.
 
+            let len = english_word.len();
+
             //Is the length correct?
-            if english_word.len() != info.size - 1 && english_word.len() != info.size {
+            if len != info.size - 1 && len != info.size {
                 continue;
             }
             //Is the first letter correct?
@@ -62,12 +70,17 @@ fn main() {
             if english_word.chars().any(|word_char: char| !used_chars.contains(&&word_char)) {
                 continue;
             }
+            //Is the second letter in the expected range, if it exists?
+            //This is after the previous check and not before it because the list contains invalid characters.
+            if len > 1 && alphabet_char_index[english_word.chars().nth(1).expect("An error occurred").borrow()] < min_second_value {
+                continue;
+            }
             //Is the lowest char used at least once?
             if !english_word.chars().any(|word_char: char| word_char == lowest_char) {
                 continue;
             }
             //Does the word produce the same info?
-            if !is_equivalent(info, english_word.chars().collect::<Vec<char>>(), english_word.len(), alphabet_char_index.borrow()) {
+            if !is_equivalent(info, english_word.chars().collect::<Vec<char>>(), len, alphabet_char_index.borrow()) {
                 continue;
             }
 
@@ -76,6 +89,27 @@ fn main() {
 
         println!("{}", words.join("\n") + "\n----------------");
     }
+}
+
+fn map_encoded(encoded: &str, scp_char_index: &HashMap<char, usize>) -> Vec<usize> {
+    return encoded.chars().map(|char| scp_char_index[&char]).collect();
+}
+
+fn get_min_second_value(encoded: Vec<usize>, first_value: usize) -> usize {
+    //Find the first encoded value directly after the end of the first character.
+
+    let mut cur = first_value;
+
+    for val in encoded {
+        if cur < 1 {
+            //Cur is less than one, this is the value we want.
+            //This code does not account for cur being less than 0, as it should be impossible.
+            return val;
+        }
+        cur -= val;
+    }
+
+    return 1;
 }
 
 fn is_equivalent(info: Info, chars: Vec<char>, size: usize, alphabet_char_index: &HashMap<char, usize>) -> bool {
