@@ -1,13 +1,18 @@
 use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::env;
-use std::fs;
+use std::str;
 use std::iter::Map;
 use std::ops::Index;
 use std::slice::Iter;
 use regex::{Match, Regex};
 use substring::Substring;
 use lazy_static::lazy_static;
+use rust_embed::{RustEmbed, EmbeddedFile};
+
+#[derive(RustEmbed)]
+#[folder = "assets/"]
+struct Asset;
 
 fn main() {
     lazy_static! {
@@ -19,8 +24,8 @@ fn main() {
     let mut map_idx: usize = 0;
     let alphabet_char_index: HashMap<char, usize> = ALPHABET_CHAR.iter().map(|&data| {map_idx += 1; (data, map_idx) }).collect();
 
-    let words_file = fs::read_to_string("./src/words.txt").expect("An error occurred while reading the words list");
-    let english_words = words_file.split("\n").collect::<Vec<&str>>();
+    let words_file: EmbeddedFile = Asset::get("words.txt").unwrap();
+    let english_words = str::from_utf8(words_file.data.as_ref()).expect("An error occurred while reading the words list").split("\n").collect::<Vec<&str>>();
 
     let encoded_str = "<<<**.>..>>**. [33x11x020][5].*>**<**-.<..><>. [41x13x011][5]<>..<**-<> [28x9x08][1]><>...-<<*..>-**>*. [49x16x014][14]..*.*.**-*>... [26x6x02][2]*<..**...<>>.>.<*>*>*>><. [60x12x06][4]";
     let encoded_parts = SPLIT_REGEX.find_iter(encoded_str).collect::<Vec<Match>>();
