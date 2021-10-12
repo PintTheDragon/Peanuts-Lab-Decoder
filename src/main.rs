@@ -45,18 +45,28 @@ fn main() {
         //Find all the words in our word list that match.
 
         let start_char = ALPHABET_CHAR[info.first_value - 1];
+        let lowest_char = ALPHABET_CHAR[info.lowest_value - 1];
 
         for english_word in english_words.iter() {
             //Sure, this could be shortened, but it would be a massive if statement.
+
+            //Is the length correct?
             if english_word.len() != info.size - 1 && english_word.len() != info.size {
                 continue;
             }
+            //Is the first letter correct?
             if !english_word.starts_with(start_char) {
                 continue;
             }
+            //Is every character valid?
             if english_word.chars().any(|word_char: char| !used_chars.contains(&&word_char)) {
                 continue;
             }
+            //Is the lowest char used at least once?
+            if !english_word.chars().any(|word_char: char| word_char == lowest_char) {
+                continue;
+            }
+            //Does the word produce the same info?
             if !is_equivalent(info, english_word.chars().collect::<Vec<char>>(), english_word.len(), alphabet_char_index.borrow()) {
                 continue;
             }
