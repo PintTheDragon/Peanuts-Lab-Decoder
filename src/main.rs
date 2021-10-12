@@ -30,8 +30,8 @@ fn main() {
     let words_file: EmbeddedFile = Asset::get("words.txt").unwrap();
     let english_words = str::from_utf8(words_file.data.as_ref()).expect("An error occurred while reading the words list").split("\n").collect::<Vec<&str>>();
 
-    let encoded_str = "<<<**.>..>>**. [33x11x020][5].*>**<**-.<..><>. [41x13x011][5]<>..<**-<> [28x9x08][1]><>...-<<*..>-**>*. [49x16x014][14]..*.*.**-*>... [26x6x02][2]*<..**...<>>.>.<*>*>*>><. [60x12x06][4]";
-    let encoded_parts = SPLIT_REGEX.find_iter(encoded_str).collect::<Vec<Match>>();
+    let encoded_str = env::args().skip(1).collect::<Vec<String>>().join(" ");
+    let encoded_parts = SPLIT_REGEX.find_iter(&encoded_str).collect::<Vec<Match>>();
 
     for to_decode in encoded_parts {
         let mut parts = to_decode.as_str().split(" ");
