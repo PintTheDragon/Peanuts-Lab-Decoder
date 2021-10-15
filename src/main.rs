@@ -129,13 +129,16 @@ fn decode_info(info: &str) -> Info {
 
     let word_value = part_a.next().expect("Received an invalidly formatted input").parse::<usize>().expect("Received an invalidly formatted input");
     let average = part_a.next().expect("Received an invalidly formatted input").parse::<usize>().expect("Received an invalidly formatted input");
+    let first_value = part_a.next().expect("Received an invalidly formatted input").parse::<usize>().expect("Received an invalidly formatted input");
+    let lowest_value = part_b.parse::<usize>().expect("Received an invalidly formatted input");
+    let size = word_value/average;
 
     return Info {
         word_value,
         average,
-        first_value: part_a.next().expect("Received an invalidly formatted input").parse::<usize>().expect("Received an invalidly formatted input"),
-        lowest_value: part_b.parse::<usize>().expect("Received an invalidly formatted input"),
-        size: word_value/average
+        first_value,
+        lowest_value,
+        size
     };
 }
 
