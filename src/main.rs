@@ -41,6 +41,25 @@ fn main() {
         let encoded = map_encoded(encoded1, &scp_char_index);
         let info = decode_info(info1);
 
+        let mut flag = false;
+        if info.first_value < 1 {
+            println!("Non-English start character detected!");
+            flag = true;
+        }
+        if info.lowest_value < 1 {
+            println!("Non-English end character detected!");
+            flag = true;
+        }
+        if info.word_value < 1 {
+            println!("No English characters detected!");
+            flag = true;
+        }
+
+        if flag {
+            println!("----------------");
+            continue;
+        }
+
         let min_second_value = get_min_second_value(encoded, info.first_value);
 
         //Slice the alphabet to only the ones that matter.
@@ -87,7 +106,8 @@ fn main() {
             words.push(english_word);
         }
 
-        println!("{}", words.join("\n") + "\n----------------");
+        println!("{}", words.join("\n"));
+        println!("----------------");
     }
 }
 
